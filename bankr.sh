@@ -1,75 +1,81 @@
 #!/bin/bash
 
-echo "Enter number of processes:"
+echo "Enter number of processes"
 read n
 
-echo "Enter number of resources:"
+echo "Enter number of resources"
 read m
 
-echo "Enter Allocation Matrix:"
-for ((i=0; i<n; i++))
+# Allocation Matrix
+echo "Enter Allocation Matrix"
+for ((i=0;i<n;i++))
 do
-    for ((j=0; j<m; j++))
+    for ((j=0;j<m;j++))
     do
         read alloc[$i,$j]
     done
 done
 
-echo "Enter Maximum Matrix:"
-for ((i=0; i<n; i++))
+# Maximum Matrix
+echo "Enter Maximum Matrix"
+for ((i=0;i<n;i++))
 do
-    for ((j=0; j<m; j++))
+    for ((j=0;j<m;j++))
     do
         read max[$i,$j]
     done
 done
 
-echo "Enter Available Resources:"
-for ((i=0; i<m; i++))
+# Available Resources
+echo "Enter Available Resources"
+for ((j=0;j<m;j++))
 do
-    read avail[$i]
+    read avail[$j]
 done
 
-# Calculate Need Matrix
-for ((i=0; i<n; i++))
+# Calculate Need Matrix = Max - Allocation
+for ((i=0;i<n;i++))
 do
-    for ((j=0; j<m; j++))
+    for ((j=0;j<m;j++))
     do
         need[$i,$j]=$(( ${max[$i,$j]} - ${alloc[$i,$j]} ))
     done
 done
 
 # Initialize finish array
-for ((i=0; i<n; i++))
+for ((i=0;i<n;i++))
 do
     finish[$i]=0
 done
 
 count=0
 
+echo "Safe sequence is:"
+
 while [ $count -lt $n ]
 do
     found=0
 
-    for ((i=0; i<n; i++))
+    for ((i=0;i<n;i++))
     do
-        if [ ${finish[$i]} -eq 0 ]; then
+        if [ ${finish[$i]} -eq 0 ]
+        then
+            flag=0
 
-            flag=1
-
-            for ((j=0; j<m; j++))
+            for ((j=0;j<m;j++))
             do
-                if [ ${need[$i,$j]} -gt ${avail[$j]} ]; then
-                    flag=0
+                if [ ${need[$i,$j]} -gt ${avail[$j]} ]
+                then
+                    flag=1
                     break
                 fi
             done
 
-            if [ $flag -eq 1 ]; then
-
+            if [ $flag -eq 0 ]
+            then
                 echo -n "P$i "
 
-                for ((k=0; k<m; k++))
+                for ((k=0;k<m;k++))
                 do
                     avail[$k]=$(( ${avail[$k]} + ${alloc[$i,$k]} ))
                 done
@@ -81,12 +87,11 @@ do
         fi
     done
 
-    if [ $found -eq 0 ]; then
-        echo
-        echo "System is NOT in safe state"
+    if [ $found -eq 0 ]
+    then
+        echo -e "\nSystem is NOT in safe state"
         exit 1
     fi
 done
 
-echo
-echo "System is in SAFE state"
+echo -e "\nSystem is in SAFE state"
